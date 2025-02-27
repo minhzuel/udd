@@ -1,8 +1,8 @@
-import { Icons } from '@/components/icons';
-import { Card, CardContent } from '@/components/ui/card';
-import { siteConfig } from '@/config/site';
-import { Sparkles } from 'lucide-react';
 import Link from 'next/link';
+import { Sparkles } from 'lucide-react';
+import { siteConfig } from '@/config/site';
+import { Card, CardContent } from '@/components/ui/card';
+import { Icons } from '@/components/icons';
 
 // Define the type for each link item
 interface SocialLink {
@@ -37,8 +37,9 @@ export default function Page() {
         <CardContent className="p-5 md:p-10">
           <h1 className="font-semibold text-3xl mb-5">Welcome to CrudHunt!</h1>
           <div className="text-sm leading-6 mb-4">
-            Thank you for exploring CrudHunt, your free copy-and-paste 
-            library of production-ready CRUD modules and beautiful UI components crafted with Next.js, React, and Tailwind CSS.
+            Thank you for exploring CrudHunt, your free copy-and-paste library
+            of production-ready CRUD modules and beautiful UI components crafted
+            with Next.js, React, and Tailwind CSS.
           </div>
 
           <div className="text-sm leading-6 mb-4">

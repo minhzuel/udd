@@ -225,7 +225,7 @@
   *:focus-visible {
     @apply outline-ring rounded-xs shadow-none outline-2 outline-offset-3 transition-none!;
   }
-  
+
   ::-webkit-scrollbar {
     width: 5px;
   }

@@ -330,7 +330,6 @@ export default function RootLayout({ children }) {
 > [Inter](https://fonts.google.com/specimen/Inter) as the default font in your
 > CrudHunt project.
 
-
 ### Add Lucide Icon Library
 
 ```bash
@@ -458,7 +457,6 @@ Once your schema is deployed, you need to generate the Prisma Client. The Prisma
   ```
   This command will generate the Prisma Client based on your schema and save it in the `node_modules/@prisma/client` directory.
 
-
 ## 2. Supabase
 
 To get started with Supabase, follow these steps to register for a free account and obtain your connection string.
@@ -538,7 +536,6 @@ Once your schema is deployed, you need to generate the Prisma Client. The Prisma
   npx prisma generate
   ```
   This command will generate the Prisma Client based on your schema and save it in the `node_modules/@prisma/client` directory.
-
 
 ## CRUDs Setup
 

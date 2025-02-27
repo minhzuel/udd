@@ -160,7 +160,7 @@ function DataGridColumnHeader<TData, TValue>({
 
             {column.getCanSort() && (
               <>
-                <DropdownMenuItem 
+                <DropdownMenuItem
                   onClick={() => {
                     if (column.getIsSorted() === 'asc') {
                       column.clearSorting();
@@ -176,7 +176,7 @@ function DataGridColumnHeader<TData, TValue>({
                     <Check className="size-4 opacity-100! text-primary" />
                   )}
                 </DropdownMenuItem>
-                <DropdownMenuItem 
+                <DropdownMenuItem
                   onClick={() => {
                     if (column.getIsSorted() === 'desc') {
                       column.clearSorting();
