@@ -1,0 +1,28 @@
+<svg width="52" height="52" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect x="19" width="14" height="4" rx="2" fill="#BDBDBD"/>
+<rect x="19" width="14" height="4" rx="2" fill="black"/>
+<rect x="6" y="8" width="40" height="4" rx="2" fill="#BDBDBD"/>
+<rect x="6" y="8" width="10" height="4" rx="2" fill="black"/>
+<g clip-path="url(#clip0_37733_319)">
+<rect x="1.5" y="16" width="49" height="4" rx="2" fill="#BDBDBD"/>
+<rect x="1.5" y="16" width="10" height="4" rx="2" fill="black"/>
+</g>
+<rect y="24" width="52" height="4" rx="2" fill="#BDBDBD"/>
+<rect y="24" width="10" height="4" rx="2" fill="black"/>
+<g clip-path="url(#clip1_37733_319)">
+<rect x="1.5" y="32" width="49" height="4" rx="2" fill="#BDBDBD"/>
+<rect x="1.5" y="32" width="10" height="4" rx="2" fill="black"/>
+</g>
+<rect x="6" y="40" width="40" height="4" rx="2" fill="#BDBDBD"/>
+<rect x="6" y="40" width="10" height="4" rx="2" fill="black"/>
+<rect x="19" y="48" width="14" height="4" rx="2" fill="#BDBDBD"/>
+<rect x="19" y="48" width="14" height="4" rx="2" fill="black"/>
+<defs>
+<clipPath id="clip0_37733_319">
+<rect x="1.5" y="16" width="49" height="4" rx="2" fill="white"/>
+</clipPath>
+<clipPath id="clip1_37733_319">
+<rect x="1.5" y="32" width="49" height="4" rx="2" fill="white"/>
+</clipPath>
+</defs>
+</svg>
