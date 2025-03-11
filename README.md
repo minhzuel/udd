@@ -19,7 +19,7 @@ Follow [Components Setup](https://reui.io/docs/installation) guide to start usin
 Kickstart your Next.js projects with ReUI apps using the [Apps Setup Guide](https://reui.io/docs/apps).
 
 > [!NOTE]
-> We use `Next.js`, `Next.js API routes`, `Prisma ORM`, and `PostgreSQL` by default for app prototyping, delivering full frontend and backend logic. This setup enables > you to seamlessly adapt our Apps to any `React` framework or backend of your choice.
+> We use `Next.js`, `Next.js API routes`, `Prisma ORM`, and `PostgreSQL` by default for app prototyping, delivering full frontend and backend logic. This setup enables you to seamlessly adapt our Apps to any `React` framework or backend of your choice.
 
 
 ## Contributing
