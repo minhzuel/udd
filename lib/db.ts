@@ -53,7 +53,7 @@ export async function isUnique<T extends keyof PrismaClient & string>(
  */
 export async function getDemoUser(): Promise<User | null> {
   const user = await prisma.user.findUnique({
-    where: { email: 'admin@crudhunt.com' },
+    where: { email: 'admin@reui.io' },
     include: { role: true }, // Ensures role relation is included
   });
 

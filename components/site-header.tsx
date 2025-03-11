@@ -18,14 +18,14 @@ export function SiteHeader() {
             <Image
               src="/brand/logo-text-light.svg"
               alt={siteConfig.name}
-              width={125}
+              width={75}
               height={0}
               className="dark:hidden"
             />
             <Image
               src="/brand/logo-text-dark.svg"
               alt={siteConfig.name}
-              width={120}
+              width={75}
               height={0}
               className="hidden dark:inline-block"
             />

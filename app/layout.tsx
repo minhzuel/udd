@@ -9,12 +9,6 @@ import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
 import '@/styles/globals.css';
 
-export const metadata = {
-  title: 'CrudHunt',
-  description:
-    'Plug-and-play CRUDs and UI components built with React, Next.js, and Radix UI, styled elegantly with Tailwind',
-};
-
 const inter = Inter({ subsets: ['latin'] });
 
 export default async function RootLayout({

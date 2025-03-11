@@ -15,6 +15,13 @@ import {
 } from '@/components/ui/collapsible';
 import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer';
 
+interface NavItem {
+  title: string;
+  href?: string;
+  external?: boolean;
+  children?: NavItem[];
+}
+
 export function MobileNav() {
   const [open, setOpen] = React.useState(false);
 
@@ -33,48 +40,14 @@ export function MobileNav() {
         </DrawerTrigger>
         <DrawerContent className="max-h-[60svh] p-5">
           <div className="flex flex-col space-y-3">
-            {siteConfig.nav.map((item) => {
-              // If the nav item has children, render it as a collapsible section.
-              if (item.children && item.children.length > 0) {
-                return (
-                  <Collapsible key={item.title}>
-                    <CollapsibleTrigger className="cursor-pointer flex w-full items-center justify-between text-sm font-medium hover:text-foreground transition-colors">
-                      <span>{item.title}</span>
-                      <ChevronDown className="ms-1 size-3.5 opacity-60" />
-                    </CollapsibleTrigger>
-                    <CollapsibleContent>
-                      <div className="pt-2 ms-4 flex flex-col space-y-2">
-                        {item.children.map((child) => (
-                          <MobileLink
-                            key={child.href}
-                            href={child.href}
-                            onOpenChange={setOpen}
-                            className="text-sm text-muted-foreground hover:text-foreground"
-                          >
-                            {child.title}
-                          </MobileLink>
-                        ))}
-                      </div>
-                    </CollapsibleContent>
-                  </Collapsible>
-                );
-              }
-
-              // Otherwise, render a simple mobile link.
-              return (
-                <MobileLink
-                  key={item.href}
-                  href={item.href || '#'}
-                  onOpenChange={setOpen}
-                  className="inline-flex items-center justify-between text-sm"
-                >
-                  {item.title}
-                  {item.external && (
-                    <ArrowUpRight className="ms-1 size-3.5 opacity-60" />
-                  )}
-                </MobileLink>
-              );
-            })}
+            {siteConfig.nav.map((item) => (
+              <NavItemRenderer
+                key={item.title}
+                item={item}
+                onOpenChange={setOpen}
+                level={1}
+              />
+            ))}
           </div>
         </DrawerContent>
       </Drawer>
@@ -96,6 +69,56 @@ export function MobileNav() {
         />
       </Link>
     </div>
+  );
+}
+
+interface NavItemRendererProps {
+  item: NavItem;
+  onOpenChange: (open: boolean) => void;
+  level: number;
+}
+
+function NavItemRenderer({ item, onOpenChange, level }: NavItemRendererProps) {
+  const [isOpen, setIsOpen] = React.useState(false);
+  const hasChildren = item.children && item.children.length > 0;
+
+  if (hasChildren && level <= 3) {
+    return (
+      <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+        <CollapsibleTrigger className="cursor-pointer flex w-full items-center justify-between text-sm font-medium hover:text-foreground transition-colors">
+          <span>{item.title}</span>
+          <ChevronDown
+            className={cn(
+              'ms-1 size-3.5 opacity-60 transition-transform',
+              isOpen && 'rotate-180',
+            )}
+          />
+        </CollapsibleTrigger>
+        <CollapsibleContent>
+          <div className={cn('pt-2 flex flex-col space-y-2', `ps-5`)}>
+            {item.children!.map((child) => (
+              <NavItemRenderer
+                key={child.title}
+                item={child}
+                onOpenChange={onOpenChange}
+                level={level + 1}
+              />
+            ))}
+          </div>
+        </CollapsibleContent>
+      </Collapsible>
+    );
+  }
+
+  return (
+    <MobileLink
+      href={item.href || '#'}
+      onOpenChange={onOpenChange}
+      className="inline-flex items-center justify-between text-sm"
+    >
+      {item.title}
+      {item.external && <ArrowUpRight className="ms-1 size-3.5 opacity-60" />}
+    </MobileLink>
   );
 }
 

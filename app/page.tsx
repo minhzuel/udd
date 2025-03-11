@@ -35,23 +35,22 @@ export default function Page() {
     <div className="container h-full flex items-center justify-center py-5">
       <Card className="md:w-[600px]">
         <CardContent className="p-5 md:p-10">
-          <h1 className="font-semibold text-3xl mb-5">Welcome to CrudHunt!</h1>
+          <h1 className="font-semibold text-3xl mb-5">Welcome to ReUI!</h1>
           <div className="text-sm leading-6 mb-4">
-            Thank you for exploring CrudHunt, your free copy-and-paste library
-            of production-ready CRUD modules and beautiful UI components crafted
-            with Next.js, React, and Tailwind CSS.
+            Thank you for exploring ReUI, your open-source components and apps
+            crafted with React, Next.js and Tailwind CSS.
           </div>
 
           <div className="text-sm leading-6 mb-4">
             To get started, please use the main navigation above to browse
-            through our collection of CRUD modules tailored for Next.js and
-            React applications.
+            through our collection of apps tailored for Next.js and React
+            projects.
           </div>
 
           <div className="text-sm leading-6">
             <div className="mb-5">
-              Enjoying CrudHunt? Support us and stay connected! Star us on
-              GitHub to help us grow, follow us on X for updates, or share your
+              Enjoying ReUI? Support us and stay connected! Star us on GitHub to
+              help us grow, follow us on X for updates, or share your
               suggestions via GitHub to make it even better every action means
               the world to us:
             </div>

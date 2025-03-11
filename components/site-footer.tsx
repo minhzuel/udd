@@ -6,7 +6,7 @@ export function SiteFooter() {
       <div className="container flex flex-col items-center justify-between gap-1 md:gap-2.5 py-3 md:py-4 md:flex-row">
         <div className="text-balance text-center text-sm leading-loose text-muted-foreground md:text-left">
           &copy;
-          {new Date().getFullYear()} CrudHunt. All rights reserved.
+          {new Date().getFullYear()} ReUI. All rights reserved.
         </div>
 
         <div className="inline-flex gap-1 items-center text-sm">

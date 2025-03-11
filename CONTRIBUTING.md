@@ -1,18 +1,20 @@
-# Contributing to CrudHunt
+# Contributing to ReUI
 
-Thank you for considering contributing to CrudHunt! Your contributions help improve the project for everyone. Please follow these guidelines to ensure a smooth collaboration. If you need any help, feel free to reach out us via [@crudhunt](https://x.com/crudhunt).
+Thank you for considering contributing to reui! Your contributions help improve the project for everyone.
+Please follow these guidelines to ensure a smooth collaboration. 
+If you need any help, feel free to reach out us via [@reui_io](https://x.com/reui_io).
 
 ## Getting Started
 
 1. **Fork the Repository**: Click the 'Fork' button on the top right of the repository page.
 2. **Clone Your Fork**:
    ```sh
-   git clone https://github.com/keenthemes/crudhunt.git
-   cd crudhunt
+   git clone https://github.com/keenthemes/reui.git
+   cd reui
    ```
 3. **Set Up Upstream Remote**:
    ```sh
-   git remote add upstream https://github.com/keenthemes/crudhunt.git
+   git remote add upstream https://github.com/keenthemes/reui.git
    ```
 
 ## Setting Up the Development Environment
@@ -73,13 +75,13 @@ feat(components): add new prop to the avatar component
    git push origin feature-branch
    ```
 4. Open a pull request:
-   - Go to the [CrudHunt GitHub repository](https://github.com/keenthemes/crudhunt.git).
+   - Go to the [reui GitHub repository](https://github.com/keenthemes/reui.git).
    - Click on 'New Pull Request'.
    - Select your branch and submit the PR.
 
 ## Code Review
 
-Code is reviewed under strict terms to make sure it matches CrudHunt code standards and design guidelines.
+Code is reviewed under strict terms to make sure it matches reui code standards and design guidelines.
 
 ---
 

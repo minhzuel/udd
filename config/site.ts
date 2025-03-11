@@ -20,79 +20,84 @@ export interface SiteConfig {
 }
 
 export const siteConfig = {
-  name: 'CrudHunt',
-  url: 'https://crudhunt.com',
-  ogImage: 'https://crudhunt.com/og.jpg',
+  name: 'ReUI',
+  url: 'https://reui.io',
+  ogImage: 'https://reui.io/og.jpg',
   description:
-    'Copy-and-paste UI components & CRUD modules powered by React, Next.js and styled with Tailwind.',
+    'An open-source collection of copy-and-paste UI components and fully functional apps build with React, Next.js and Tailwind CSS',
   links: {
     privacy: '/privacy-policy',
-    twitter: 'https://x.com/crudhunt',
-    github: 'https://github.com/keenthemes/crudhunt',
+    twitter: 'https://x.com/reui_io',
+    github: 'https://github.com/keenthemes/reui',
     suggestions:
-      'https://github.com/keenthemes/crudhunt/discussions/categories/suggestions',
+      'https://github.com/keenthemes/reui/discussions/categories/suggestions',
   },
   nav: [
     {
-      title: 'User',
+      title: 'Apps',
       children: [
         {
-          title: 'Users',
-          href: '/cruds/user/users',
+          title: 'User',
+          children: [
+            {
+              title: 'Users',
+              href: '/apps/user/users',
+            },
+            {
+              title: 'Roles',
+              href: '/apps/user/roles',
+            },
+            {
+              title: 'Permissions',
+              href: '/apps/user/permissions',
+            },
+            {
+              title: 'Account',
+              href: '/apps/user/account',
+            },
+          ],
         },
         {
-          title: 'Roles',
-          href: '/cruds/user/roles',
+          title: 'System',
+          children: [
+            {
+              title: 'Settings',
+              href: '/apps/system/settings',
+            },
+            {
+              title: 'Logs',
+              href: '/apps/system/logs',
+            },
+          ],
         },
         {
-          title: 'Permissions',
-          href: '/cruds/user/permissions',
-        },
-        {
-          title: 'Account',
-          href: '/cruds/user/account',
-        },
-      ],
-    },
-    {
-      title: 'System',
-      children: [
-        {
-          title: 'Settings',
-          href: '/cruds/system/settings',
-        },
-        {
-          title: 'Logs',
-          href: '/cruds/system/logs',
-        },
-      ],
-    },
-    {
-      title: 'eCommerce',
-      children: [
-        {
-          title: 'Categories',
-          href: '/cruds/ecommerce/categories',
-        },
-        {
-          title: 'Products',
-          href: '/cruds/ecommerce/products',
+          title: 'eCommerce',
+          children: [
+            {
+              title: 'Categories',
+              href: '/apps/ecommerce/categories',
+            },
+            {
+              title: 'Products',
+              href: '/apps/ecommerce/products',
+            },
+          ],
         },
       ],
     },
     {
       title: 'Components',
-      href: 'https://crudhunt.com/components',
+      href: 'https://reui.io/components',
       external: true,
     },
     {
-      title: 'Boilerplates',
-      href: 'https://keenthemes.com/shoplit',
+      title: 'Products',
+      href: 'https://keenthemes.com/',
       external: true,
     },
     {
       title: 'Docs',
-      href: 'https://crudhunt.com/docs',
+      href: 'https://reui.io/docs',
       external: true,
     },
   ],

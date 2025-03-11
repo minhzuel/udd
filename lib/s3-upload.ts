@@ -1,6 +1,6 @@
 import { DeleteObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
+import { uid } from '@/lib/helpers';
 import { getS3ClientInstance } from './s3-client';
-import { uid } from './utils';
 
 // Get storage configuration
 function getConfig() {
