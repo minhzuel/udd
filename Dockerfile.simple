@@ -6,11 +6,13 @@ WORKDIR /app
 # Install dependencies only when needed
 FROM base AS deps
 
-# Install build dependencies for node-gyp and canvas
-RUN apk add --no-cache python3 make g++ pkgconfig pixman-dev cairo-dev pango-dev jpeg-dev giflib-dev
+# Install only required build dependencies
+RUN apk add --no-cache python3 make g++
 
 COPY package.json package-lock.json ./
-RUN npm ci
+
+# Install dependencies without canvas (which requires additional build tools)
+RUN npm ci --omit=optional --no-package-lock
 
 # Rebuild the source code only when needed
 FROM base AS builder
@@ -25,7 +27,7 @@ ENV NEXT_TELEMETRY_DISABLED 1
 # Generate Prisma client
 RUN npx prisma generate
 
-# Build application - removing cache mounts that were causing issues
+# Build application
 RUN npm run build
 
 # Production image, copy all the files and run next

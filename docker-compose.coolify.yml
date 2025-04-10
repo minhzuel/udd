@@ -4,7 +4,10 @@ services:
   app:
     build:
       context: .
+      # Use the main Dockerfile by default
+      # If you encounter build issues, try using Dockerfile.simple instead
       dockerfile: Dockerfile
+      # dockerfile: Dockerfile.simple
     restart: always
     ports:
       - "3000:3000"
