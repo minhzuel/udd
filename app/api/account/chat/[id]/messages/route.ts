@@ -3,7 +3,7 @@ import prisma from '@/lib/prisma'
 
 export async function GET(
   request: NextRequest,
-  context: { params: { id: string } }
+  { params }: { params: { id: string } }
 ) {
   try {
     // Get session cookie directly from the request
@@ -34,7 +34,7 @@ export async function GET(
     let conversationId: number
     try {
       // Use the id from context.params directly
-      conversationId = parseInt(context.params.id)
+      conversationId = parseInt(params.id)
       if (isNaN(conversationId) || conversationId <= 0) {
         throw new Error('Invalid conversation ID')
       }
@@ -225,7 +225,7 @@ export async function GET(
 
 export async function POST(
   request: NextRequest,
-  context: { params: { id: string } }
+  { params }: { params: { id: string } }
 ) {
   try {
     // Get session cookie directly from the request
@@ -256,7 +256,7 @@ export async function POST(
     let conversationId: number
     try {
       // Get params safely
-      const id = context.params.id
+      const id = params.id
       conversationId = parseInt(id)
       if (isNaN(conversationId) || conversationId <= 0) {
         throw new Error('Invalid conversation ID')
