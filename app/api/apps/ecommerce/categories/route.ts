@@ -3,10 +3,16 @@ import { getClientIP } from '@/lib/api';
 import { getDemoUser, isUnique } from '@/lib/db';
 import { prisma } from '@/lib/prisma';
 import { systemLog } from '@/services/system-log';
-import {
-  CategorySchema,
-  CategorySchemaType,
-} from '@/app/apps/ecommerce/categories/forms/category';
+import * as z from 'zod';
+import { verifyJwtToken } from '@/lib/jwt';
+import { cookies } from 'next/headers';
+
+const categorySchema = z.object({
+  name: z.string().min(1),
+  slug: z.string().min(1),
+  description: z.string().optional(),
+  parentId: z.string().optional()
+});
 
 // GET: Fetch all categories with permissions and creator details
 export async function GET(request: NextRequest) {
@@ -53,11 +59,17 @@ export async function GET(request: NextRequest) {
               [sortField]: sortDirection,
             },
             include: {
+              parent: {
+                select: {
+                  id: true,
+                  name: true,
+                  slug: true,
+                },
+              },
               createdByUser: {
                 select: {
-                  name: true,
                   id: true,
-                  avatar: true,
+                  name: true,
                   email: true,
                 },
               },
@@ -81,12 +93,10 @@ export async function GET(request: NextRequest) {
       },
       empty: isTableEmpty,
     });
-  } catch {
+  } catch (error) {
+    console.error('Error fetching categories:', error);
     return NextResponse.json(
-      {
-        message:
-          'Oops! Something didn’t go as planned. Please try again in a moment.',
-      },
+      { message: 'Failed to fetch categories' },
       { status: 500 },
     );
   }
@@ -95,64 +105,101 @@ export async function GET(request: NextRequest) {
 // POST: Add a new category
 export async function POST(request: NextRequest) {
   try {
-    const currentUser = await getDemoUser();
-
-    if (!currentUser) {
+    const cookieStore = await cookies();
+    const token = cookieStore.get('token')?.value;
+    if (!token) {
       return NextResponse.json(
-        { message: 'Unauthorized action' },
+        { message: 'Unauthorized' },
         { status: 401 },
       );
     }
 
-    const clientIp = getClientIP(request);
+    const payload = await verifyJwtToken(token);
+    if (!payload?.id) {
+      return NextResponse.json(
+        { message: 'Unauthorized' },
+        { status: 401 },
+      );
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: payload.id },
+    });
+
+    if (!user) {
+      return NextResponse.json(
+        { message: 'Unauthorized' },
+        { status: 401 },
+      );
+    }
 
     const body = await request.json();
-    const parsedData = CategorySchema.safeParse(body);
-    if (!parsedData.success) {
+    const result = categorySchema.safeParse(body);
+
+    if (!result.success) {
       return NextResponse.json(
-        { error: 'Invalid input. Please check your data and try again.' },
+        { message: 'Invalid input', errors: result.error.errors },
         { status: 400 },
       );
     }
 
-    const { name, slug, description }: CategorySchemaType = parsedData.data;
+    const { name, slug, description, parentId } = result.data;
 
-    // Check for uniqueness
-    const isUniqueRole = await isUnique('ecommerceCategory', { slug, name });
-    if (!isUniqueRole) {
+    const existingCategory = await prisma.ecommerceCategory.findFirst({
+      where: {
+        OR: [
+          { name },
+          { slug },
+        ],
+      },
+    });
+
+    if (existingCategory) {
       return NextResponse.json(
-        { message: 'Name and slug must be unique.' },
+        { message: 'Category with this name or slug already exists' },
         { status: 400 },
       );
+    }
+
+    if (parentId) {
+      const parentCategory = await prisma.ecommerceCategory.findUnique({
+        where: { id: parentId },
+      });
+
+      if (!parentCategory) {
+        return NextResponse.json(
+          { message: 'Parent category not found' },
+          { status: 400 },
+        );
+      }
     }
 
     // Create the new category
     const newCategory = await prisma.ecommerceCategory.create({
       data: {
-        createdByUser: { connect: { id: currentUser.id } },
         name,
         slug,
         description,
+        parentId,
+        createdByUserId: user.id,
       },
     });
 
     // Log
     await systemLog({
       event: 'create',
-      userId: currentUser.id,
+      userId: user.id,
       entityId: newCategory.id,
       entityType: 'category',
       description: 'Category created by user',
-      ipAddress: clientIp,
+      ipAddress: getClientIP(request),
     });
 
     return NextResponse.json(newCategory);
-  } catch {
+  } catch (error) {
+    console.error('Error creating category:', error);
     return NextResponse.json(
-      {
-        message:
-          'Oops! Something didn’t go as planned. Please try again in a moment.',
-      },
+      { message: 'Failed to create category' },
       { status: 500 },
     );
   }

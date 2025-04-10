@@ -89,7 +89,6 @@ export async function GET(req: NextRequest) {
             id: true,
             name: true,
             email: true,
-            avatar: true,
           },
         },
       },
@@ -104,9 +103,10 @@ export async function GET(req: NextRequest) {
         limit,
       },
     });
-  } catch {
+  } catch (error) {
+    console.error('Error fetching system logs:', error);
     return NextResponse.json(
-      { message: 'Oops! Something went wrong. Please try again in a moment.' },
+      { message: 'Failed to fetch system logs' },
       { status: 500 },
     );
   }

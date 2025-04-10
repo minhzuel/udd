@@ -89,7 +89,7 @@ const UserList = () => {
 
     if (!response.ok) {
       throw new Error(
-        'Oops! Something didn’t go as planned. Please try again in a moment.',
+        'Oops! Something didn\'t go as planned. Please try again in a moment.'
       );
     }
 
@@ -355,11 +355,10 @@ const UserList = () => {
             <Input
               placeholder="Search users"
               value={inputValue}
-              size="sm"
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               disabled={isLoading}
-              className="ps-9 w-full sm:40 md:w-64"
+              className="ps-9 w-36 sm:w-64"
             />
             {searchQuery.length > 0 && (
               <Button

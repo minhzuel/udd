@@ -6,6 +6,7 @@ import { Icons } from '@/components/icons';
 import { MobileNav } from '@/components/mobile-nav';
 import { ModeSwitcher } from '@/components/mode-switcher';
 import { MainNav } from './main-nav';
+import { LanguageSwitcher } from './language-switcher';
 
 export function SiteHeader() {
   return (
@@ -55,6 +56,7 @@ export function SiteHeader() {
                 <span className="sr-only">X</span>
               </Link>
             </Button>
+            <LanguageSwitcher />
             <ModeSwitcher />
           </nav>
         </div>

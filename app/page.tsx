@@ -1,78 +1,58 @@
-import Link from 'next/link';
-import { Sparkles } from 'lucide-react';
-import { siteConfig } from '@/config/site';
-import { Card, CardContent } from '@/components/ui/card';
-import { Icons } from '@/components/icons';
+import { Suspense } from 'react'
+import { CategorySliderSection } from '@/components/home/CategorySliderSection'
+import { FeaturedCategories } from '@/components/home/FeaturedCategories'
+// All sections below use the same ProductCard component from @/components/product/ProductCard
+// ensuring consistent product styling across the home page
+import { OfferSection } from '@/components/home/OfferSection'
+import { NewCollection } from '@/components/home/NewCollection'
+import CollectedSection from '@/components/home/CollectedSection'
+import { MobileSliders } from '@/components/home/MobileSliders'
 
-// Define the type for each link item
-interface SocialLink {
-  text: string;
-  href: string;
-  icon: React.ReactNode; // Use ReactNode for JSX elements
-}
-
-export default function Page() {
-  // Array of link items with proper typing
-  const socialLinks: SocialLink[] = [
-    {
-      text: 'Star us on GitHub',
-      href: siteConfig.links.github,
-      icon: <Icons.github className="h-4 w-4" />, // Define className here
-    },
-    {
-      text: 'Follow us on X',
-      href: siteConfig.links.twitter,
-      icon: <Icons.twitter className="size-3.5" />, // Define className here
-    },
-    {
-      text: 'Share your suggestions',
-      href: siteConfig.links.suggestions,
-      icon: <Sparkles className="h-4 w-4" />, // Define className here
-    },
-  ];
-
-  return (
-    <div className="container h-full flex items-center justify-center py-5">
-      <Card className="md:w-[600px]">
-        <CardContent className="p-5 md:p-10">
-          <h1 className="font-semibold text-3xl mb-5">Welcome to ReUI!</h1>
-          <div className="text-sm leading-6 mb-4">
-            Thank you for exploring ReUI, your open-source components and apps
-            crafted with React, Next.js and Tailwind CSS.
-          </div>
-
-          <div className="text-sm leading-6 mb-4">
-            To get started, please use the main navigation above to browse
-            through our collection of apps tailored for Next.js and React
-            projects.
-          </div>
-
-          <div className="text-sm leading-6">
-            <div className="mb-5">
-              Enjoying ReUI? Support us and stay connected! Star us on GitHub to
-              help us grow, follow us on X for updates, or share your
-              suggestions via GitHub to make it even better every action means
-              the world to us:
-            </div>
-
-            <div className="space-y-2.5">
-              {socialLinks.map((link, index) => (
-                <div key={index} className="flex items-center gap-2.5">
-                  <Link
-                    className="inline-flex items-center gap-2.5 text-foreground hover:underline hover:underline-offset-2"
-                    href={link.href}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    {link.icon}
-                    {link.text}
-                  </Link>
-                </div>
-              ))}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+// Loading component for sections
+const SectionLoading = () => (
+  <div className="py-12">
+    <div className="container mx-auto px-4">
+      <div className="animate-pulse">
+        <div className="h-8 w-48 bg-gray-200 rounded mb-8"></div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="bg-gray-200 h-48 rounded-lg"></div>
+          ))}
+        </div>
+      </div>
     </div>
-  );
+  </div>
+)
+
+export default function Home() {
+  return (
+    <main className="min-h-screen">
+      {/* Mobile Sliders - shown only on mobile */}
+      <div className="md:hidden">
+        <Suspense fallback={<SectionLoading />}>
+          <MobileSliders />
+        </Suspense>
+      </div>
+      
+      {/* CategorySliderSection - hidden on mobile */}
+      <div className="hidden md:block">
+        <Suspense fallback={<SectionLoading />}>
+          <CategorySliderSection />
+        </Suspense>
+      </div>
+      
+      <Suspense fallback={<SectionLoading />}>
+        <FeaturedCategories />
+      </Suspense>
+      <Suspense fallback={<SectionLoading />}>
+        <OfferSection />
+      </Suspense>
+      <Suspense fallback={<SectionLoading />}>
+        <NewCollection />
+      </Suspense>
+      <Suspense fallback={<SectionLoading />}>
+        <CollectedSection />
+      </Suspense>
+    </main>
+  )
 }

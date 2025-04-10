@@ -10,8 +10,8 @@ export const UserStatusProps = {
     label: 'Inactive',
     variant: 'warning',
   },
-  [UserStatus.BLOCKED]: {
-    label: 'Blocked',
+  [UserStatus.SUSPENDED]: {
+    label: 'Suspended',
     variant: 'destructive',
   },
 };

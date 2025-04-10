@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Category Image Generator</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      padding: 20px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .canvas-container {
+      margin: 20px 0;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+    canvas {
+      border: 1px solid #ddd;
+      max-width: 100%;
+    }
+    .controls {
+      margin-bottom: 30px;
+      padding: 20px;
+      background: #f7f7f7;
+      border-radius: 8px;
+    }
+    button {
+      background: #4f46e5;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-right: 10px;
+    }
+    input, select {
+      padding: 8px;
+      margin-bottom: 10px;
+      width: 100%;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    .color-row {
+      display: flex;
+      gap: 10px;
+    }
+    .color-row div {
+      flex: 1;
+    }
+    .download-all {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Category Image Generator</h1>
+  
+  <div class="controls">
+    <div class="color-row">
+      <div>
+        <label for="bgColor">Background Color</label>
+        <input type="color" id="bgColor" value="#4f46e5">
+      </div>
+      <div>
+        <label for="textColor">Text Color</label>
+        <input type="color" id="textColor" value="#ffffff">
+      </div>
+    </div>
+    
+    <label for="categories">Categories (one per line)</label>
+    <textarea id="categories" rows="10" style="width: 100%;">Electronics
+Clothing
+Books
+Home & Kitchen
+Toys
+Beauty
+Sports
+Automotive
+Jewelry
+Groceries
+Health
+Garden
+Pets
+Office
+Default</textarea>
+    
+    <button id="generateBtn" style="margin-top: 10px;">Generate All Images</button>
+  </div>
+  
+  <h2>Generated Images</h2>
+  <div class="canvas-container" id="canvasContainer"></div>
+  
+  <div class="download-all">
+    <button id="downloadAllBtn">Download All Images</button>
+  </div>
+  
+  <script>
+    const generateBtn = document.getElementById('generateBtn');
+    const downloadAllBtn = document.getElementById('downloadAllBtn');
+    const categoriesTextarea = document.getElementById('categories');
+    const canvasContainer = document.getElementById('canvasContainer');
+    const bgColorInput = document.getElementById('bgColor');
+    const textColorInput = document.getElementById('textColor');
+    
+    const generateCanvases = () => {
+      // Clear previous canvases
+      canvasContainer.innerHTML = '';
+      
+      const categories = categoriesTextarea.value.split('\n').filter(cat => cat.trim() !== '');
+      const bgColor = bgColorInput.value;
+      const textColor = textColorInput.value;
+      
+      categories.forEach(category => {
+        const canvasWrapper = document.createElement('div');
+        
+        const canvas = document.createElement('canvas');
+        canvas.width = 600;
+        canvas.height = 400;
+        canvas.dataset.category = category.toLowerCase().replace(/\s+/g, '-');
+        
+        const ctx = canvas.getContext('2d');
+        
+        // Draw background
+        ctx.fillStyle = bgColor;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Draw text
+        ctx.fillStyle = textColor;
+        ctx.font = 'bold 40px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(category, canvas.width / 2, canvas.height / 2);
+        
+        // Add a subtle pattern
+        ctx.strokeStyle = textColor;
+        ctx.globalAlpha = 0.1;
+        for (let i = 0; i < 5; i++) {
+          ctx.beginPath();
+          ctx.arc(canvas.width / 2, canvas.height / 2, 100 + i * 20, 0, 2 * Math.PI);
+          ctx.stroke();
+        }
+        ctx.globalAlpha = 1;
+        
+        // Create download button
+        const downloadBtn = document.createElement('button');
+        downloadBtn.textContent = `Download ${category}`;
+        downloadBtn.onclick = () => {
+          downloadImage(canvas, category);
+        };
+        
+        canvasWrapper.appendChild(canvas);
+        canvasWrapper.appendChild(downloadBtn);
+        canvasContainer.appendChild(canvasWrapper);
+      });
+    };
+    
+    const downloadImage = (canvas, category) => {
+      const link = document.createElement('a');
+      link.download = `${category.toLowerCase().replace(/\s+/g, '-')}.jpg`;
+      link.href = canvas.toDataURL('image/jpeg', 0.9);
+      link.click();
+    };
+    
+    const downloadAllImages = () => {
+      document.querySelectorAll('canvas').forEach(canvas => {
+        const category = canvas.dataset.category;
+        downloadImage(canvas, category);
+      });
+    };
+    
+    generateBtn.addEventListener('click', generateCanvases);
+    downloadAllBtn.addEventListener('click', downloadAllImages);
+    
+    // Initial generation
+    generateCanvases();
+  </script>
+</body>
+</html> 

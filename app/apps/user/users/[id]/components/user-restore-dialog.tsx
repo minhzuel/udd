@@ -28,7 +28,7 @@ import { Spinner } from '@/components/ui/spinners';
 import { User } from '@/app/models/user';
 
 // Validation schema for email confirmation
-const EmailConfirmationSchema = (userEmail: string) =>
+const EmailConfirmationSchema = (userEmail: string | null | undefined) =>
   z.object({
     confirmEmail: z
       .string()

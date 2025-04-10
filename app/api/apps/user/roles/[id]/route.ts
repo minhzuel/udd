@@ -191,7 +191,7 @@ export async function DELETE(
 
     // Check if the role is assigned to any user
     const roleAssignedToUsers = await prisma.user.count({
-      where: { roleId: id },
+      where: { role_id: id },
     });
 
     if (roleAssignedToUsers > 0) {

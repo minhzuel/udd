@@ -109,7 +109,7 @@ const RoleList = () => {
 
     if (!response.ok) {
       throw new Error(
-        'Oops! Something didn’t go as planned. Please try again in a moment.',
+        'Oops! Something didn\'t go as planned. Please try again in a moment.'
       );
     }
 
@@ -241,14 +241,14 @@ const RoleList = () => {
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
-                variant="destructive"
                 disabled={row.original.isProtected}
                 onClick={() => {
                   setDeleteRole(row.original);
                   setDeleteDialogOpen(true);
                 }}
+                className="text-destructive"
               >
-                Delete role
+                Delete
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -299,11 +299,10 @@ const RoleList = () => {
             <Input
               placeholder="Search users"
               value={inputValue}
-              size="sm"
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               disabled={isLoading}
-              className="ps-9 w-full md:w-64"
+              className="ps-9 w-36 sm:w-64"
             />
             {searchQuery.length > 0 && (
               <Button

@@ -1,53 +1,35 @@
-import { ReactNode, Suspense } from 'react';
-import { Inter } from 'next/font/google';
-import { ThemeProvider } from 'next-themes';
-import { cn } from '@/lib/utils';
-import { DirectionProvider } from '@/providers/direction-provider';
-import { QueryProvider } from '@/providers/query-provider';
-import { Toaster } from '@/components/ui/sonner';
-import { SiteFooter } from '@/components/site-footer';
-import { SiteHeader } from '@/components/site-header';
-import '@/styles/globals.css';
+import type { Metadata } from 'next'
+import { Inter } from 'next/font/google'
+import './globals.css'
+import { Header } from '@/components/layout/Header'
+import { Footer } from '@/components/layout/Footer'
+import { MobileFooter } from '@/components/layout/MobileFooter'
+import { Providers } from './providers/providers'
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ subsets: ['latin'] })
 
-export default async function RootLayout({
+export const metadata: Metadata = {
+  title: 'Uddog - Change the wind',
+  description: 'Your one-stop destination for all your shopping needs.',
+}
+
+export default function RootLayout({
   children,
 }: {
-  children: ReactNode;
+  children: React.ReactNode
 }) {
   return (
-    <html className="h-full" suppressHydrationWarning>
-      <body
-        className={cn('flex h-full text-base antialiased', inter.className)}
-        style={{ overflow: 'visible !important', marginRight: '0 !important' }}
-      >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="light"
-          enableSystem
-          disableTransitionOnChange
-          enableColorScheme
-        >
-          <QueryProvider>
-            <DirectionProvider>
-              <Suspense>
-                <div
-                  vaul-drawer-wrapper="true"
-                  className="w-full relative min-h-screen bg-background"
-                >
-                  <div className="flex flex-col h-full">
-                    <SiteHeader />
-                    <main className="grow flex-1">{children}</main>
-                    <SiteFooter />
-                  </div>
-                </div>
-              </Suspense>
-            </DirectionProvider>
-          </QueryProvider>
-        </ThemeProvider>
-        <Toaster />
+    <html lang="en" suppressHydrationWarning>
+      <body className={inter.className}>
+        <Providers>
+          <Header />
+          <main className="pb-20 md:pb-0">
+            {children}
+          </main>
+          <Footer />
+          <MobileFooter />
+        </Providers>
       </body>
     </html>
-  );
+  )
 }

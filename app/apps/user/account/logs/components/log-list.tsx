@@ -85,7 +85,7 @@ const LogList = () => {
 
     if (!response.ok) {
       throw new Error(
-        'Oops! Something didn’t go as planned. Please try again in a moment.',
+        'Oops! Something didn\'t go as planned. Please try again in a moment.'
       );
     }
 
@@ -260,11 +260,10 @@ const LogList = () => {
             <Input
               placeholder="Search logs"
               value={inputValue}
-              size="sm"
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               disabled={isLoading}
-              className="ps-9 w-full md:w-56"
+              className="ps-9 w-36 sm:w-64"
             />
             {searchQuery.length > 0 && (
               <Button

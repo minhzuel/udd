@@ -70,7 +70,6 @@ export const CategoryActionsCell = ({
           <DropdownMenuItem onClick={handleCopyId}>Copy ID</DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
-            variant="destructive"
             onClick={() => {
               setDeleteCategory(row.original);
               setDeleteDialogOpen(true);

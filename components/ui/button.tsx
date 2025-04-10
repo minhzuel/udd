@@ -339,45 +339,35 @@ export interface ButtonProps
   selected?: boolean;
 }
 
-function Button({
-  className,
-  selected,
-  variant,
-  shape,
-  appearance,
-  mode,
-  size,
-  autoHeight,
-  underlined,
-  underline,
-  asChild = false,
-  placeholder = false,
-  ...props
-}: ButtonProps) {
-  const Comp = asChild ? Slot : 'button';
-  return (
-    <Comp
-      data-slot="button"
-      className={cn(
-        buttonVariants({
-          variant,
-          size,
-          shape,
-          appearance,
-          mode,
-          autoHeight,
-          placeholder,
-          underlined,
-          underline,
-          className,
-        }),
-        asChild && props.disabled && 'pointer-events-none opacity-50',
-      )}
-      {...(selected && { 'data-state': 'open' })}
-      {...props}
-    />
-  );
-}
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, selected, variant, shape, appearance, mode, size, autoHeight, underlined, underline, asChild = false, placeholder = false, ...props }, ref) => {
+    const Comp = asChild ? Slot : 'button';
+    return (
+      <Comp
+        data-slot="button"
+        className={cn(
+          buttonVariants({
+            variant,
+            size,
+            shape,
+            appearance,
+            mode,
+            autoHeight,
+            placeholder,
+            underlined,
+            underline,
+            className,
+          }),
+          asChild && props.disabled && 'pointer-events-none opacity-50',
+        )}
+        ref={ref}
+        {...(selected && { 'data-state': 'open' })}
+        {...props}
+      />
+    );
+  }
+);
+Button.displayName = 'Button';
 
 interface ButtonArrowProps extends React.SVGProps<SVGSVGElement> {
   icon?: LucideIcon; // Allows passing any Lucide icon

@@ -115,11 +115,11 @@ export const CategoryStatusCell = ({
             value={status}
             onValueChange={(value) => mutation.mutate(value)}
           >
-            <DropdownMenuRadioItem value="ACTIVE">
-              {CategoryStatusProps.ACTIVE.label}
+            <DropdownMenuRadioItem value={EcommerceCategoryStatus.ACTIVE}>
+              {getCategoryStatusProps(EcommerceCategoryStatus.ACTIVE).label}
             </DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value="INACTIVE">
-              {CategoryStatusProps.INACTIVE.label}
+            <DropdownMenuRadioItem value={EcommerceCategoryStatus.INACTIVE}>
+              {getCategoryStatusProps(EcommerceCategoryStatus.INACTIVE).label}
             </DropdownMenuRadioItem>
           </DropdownMenuRadioGroup>
         </DropdownMenuContent>

@@ -111,7 +111,7 @@ const PermissionList = () => {
 
     if (!response.ok) {
       throw new Error(
-        'Oops! Something didn’t go as planned. Please try again in a moment',
+        'Oops! Something didn\'t go as planned. Please try again in a moment'
       );
     }
 
@@ -268,13 +268,13 @@ const PermissionList = () => {
                 Edit permission
               </DropdownMenuItem>
               <DropdownMenuItem
-                variant="destructive"
                 onClick={() => {
                   setDeletePermission(row.original);
                   setDeleteDialogOpen(true);
                 }}
+                className="text-destructive"
               >
-                Delete permission
+                Delete
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -335,11 +335,10 @@ const PermissionList = () => {
             <Input
               placeholder="Search permissions"
               value={inputValue}
-              size="sm"
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               disabled={isLoading && true}
-              className="ps-9 w-full sm:w-64"
+              className="ps-9 w-36 sm:w-64"
             />
             {searchQuery.length > 0 && (
               <Button

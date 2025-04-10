@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
       where: {
         AND: [
           ...(statusFilter ? [{ status: statusFilter }] : []), // Add status filter if valid
-          ...(roleId && roleId !== 'all' ? [{ roleId }] : []), // Add role filter if valid
+          ...(roleId && roleId !== 'all' ? [{ role_id: roleId }] : []), // Add role filter if valid
           {
             OR: [
               { name: { contains: query, mode: 'insensitive' } },
@@ -60,7 +60,7 @@ export async function GET(req: NextRequest) {
       where: {
         AND: [
           ...(statusFilter ? [{ status: statusFilter }] : []), // Add status filter if valid
-          ...(roleId && roleId !== 'all' ? [{ roleId }] : []), // Add role filter if valid
+          ...(roleId && roleId !== 'all' ? [{ role_id: roleId }] : []), // Add role filter if valid
           {
             OR: [
               { name: { contains: query, mode: 'insensitive' } },
@@ -165,7 +165,7 @@ export async function POST(request: NextRequest) {
           name,
           email,
           status: UserStatus.ACTIVE,
-          roleId,
+          role_id: roleId,
         },
       });
 

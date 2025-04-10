@@ -7,206 +7,754 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// User Modoule
-enum UserStatus {
-  INACTIVE
-  ACTIVE
-  BLOCKED
+model ProductToVariation {
+  A                  Int
+  B                  Int
+  products           products           @relation(fields: [A], references: [product_id], onDelete: Cascade)
+  product_variations product_variations @relation(fields: [B], references: [variation_id], onDelete: Cascade)
+
+  @@id([A, B], map: "_ProductToVariation_AB_pkey")
+  @@index([B], map: "_ProductToVariation_B_index")
+  @@map("_ProductToVariation")
 }
 
-model User {
-  id                String              @id @default(uuid())
-  email             String              @unique
-  password          String?
-  country           String?
-  timezone          String?
-  name              String?
-  roleId            String
-  status            UserStatus          @default(INACTIVE) // Status of the invitation
-  createdAt         DateTime            @default(now())
-  updatedAt         DateTime            @updatedAt
-  lastSignInAt      DateTime?
-  emailVerifiedAt   DateTime?
-  isTrashed         Boolean             @default(false)
-  avatar            String?
-  invitedByUserId   String?
-  isProtected       Boolean             @default(false) // Prevents deletion/modification
-  addresses         UserAddress[]
-  role              UserRole            @relation(fields: [roleId], references: [id])
-  systemLog         SystemLog[]
-  ecommerceCategory EcommerceCategory[]
-  ecommerceProduct  EcommerceProduct[]
-
-  // Indexes for efficient querying
-  @@index([invitedByUserId])
-  @@index([roleId])
-  @@index([status])
+model addresses {
+  address_id                                   Int              @id @default(autoincrement())
+  full_name                                    String?          @db.VarChar(255)
+  mobile_no                                    String?          @db.VarChar(20)
+  address                                      String?
+  city                                         String?          @db.VarChar(255)
+  user_id                                      Int?
+  is_guest_address                             Boolean?         @default(false)
+  is_default_shipping                          Boolean?         @default(false)
+  is_default_billing                           Boolean?         @default(false)
+  address_type                                 String?          @db.VarChar(50)
+  address_title                                String?          @db.VarChar(100)
+  users                                        users?           @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+  orders_orders_billing_address_idToaddresses  orders[]         @relation("orders_billing_address_idToaddresses")
+  orders_orders_shipping_address_idToaddresses orders[]         @relation("orders_shipping_address_idToaddresses")
+  user_addresses                               user_addresses[]
 }
 
-model UserRole {
-  id              String               @id @default(uuid())
-  slug            String               @unique
-  name            String               @unique
+model admin_roles {
+  role_id    Int          @id @default(autoincrement())
+  role_name  String?      @db.VarChar(255)
+  user_roles user_roles[]
+}
+
+model brands {
+  brand_id   Int        @id @default(autoincrement())
+  brand_name String?    @db.VarChar(255)
+  image_url  String?    @db.VarChar(255)
+  products   products[]
+}
+
+model categories {
+  category_id          Int                    @id @default(autoincrement())
+  category_name        String?                @db.VarChar(255)
+  parent_category_id   Int?
+  image_url            String?                @db.VarChar(255)
+  meta_title           String?                @db.VarChar(255)
+  meta_description     String?
+  slug                 String?                @unique @db.VarChar(255)
+  categories           categories?            @relation("categoriesTocategories", fields: [parent_category_id], references: [category_id], onDelete: NoAction, onUpdate: NoAction)
+  other_categories     categories[]           @relation("categoriesTocategories")
+  product_reward_rules product_reward_rules[]
+  products             products[]
+}
+
+model chat_conversations {
+  id                   Int             @id @default(autoincrement())
+  user_id              Int
+  title                String
+  status               String          @default("open")
+  product_id           Int?
+  order_id             Int?
+  last_message_preview String?
+  unread_count         Int             @default(0)
+  created_at           DateTime        @default(now()) @db.Timestamp(6)
+  updated_at           DateTime        @default(now()) @db.Timestamp(6)
+  prisma_id            String?         @unique @default(dbgenerated("(id)::text")) @map("_prisma_id")
+  orders               orders?         @relation(fields: [order_id], references: [order_id], onUpdate: NoAction)
+  products             products?       @relation(fields: [product_id], references: [product_id], onUpdate: NoAction)
+  users                users           @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction)
+  chat_messages        chat_messages[]
+
+  @@index([order_id])
+  @@index([product_id])
+  @@index([user_id])
+}
+
+model chat_messages {
+  id                 Int                @id @default(autoincrement())
+  conversation_id    Int
+  content            String?
+  message_type       String             @default("text")
+  is_from_customer   Boolean            @default(true)
+  attachment_url     String?
+  attachment_type    String?
+  timestamp          DateTime           @default(now()) @db.Timestamp(6)
+  is_read            Boolean            @default(false)
+  read_at            DateTime?          @db.Timestamp(6)
+  is_seen            Boolean            @default(false)
+  seen_at            DateTime?          @db.Timestamp(6)
+  prisma_id          String?            @unique @default(dbgenerated("(id)::text")) @map("_prisma_id")
+  chat_conversations chat_conversations @relation(fields: [conversation_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([conversation_id])
+  @@index([is_read])
+  @@index([is_seen])
+  @@index([timestamp])
+}
+
+model cities {
+  city_id    Int        @id @default(autoincrement())
+  country_id Int?
+  name       String?    @db.VarChar(255)
+  countries  countries? @relation(fields: [country_id], references: [country_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model combo_offer_products {
+  offer_id     Int
+  product_id   Int
+  quantity     Int?
+  combo_offers combo_offers @relation(fields: [offer_id], references: [offer_id], onDelete: NoAction, onUpdate: NoAction)
+  products     products     @relation(fields: [product_id], references: [product_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([offer_id, product_id])
+}
+
+model combo_offers {
+  offer_id             Int                    @id @default(autoincrement())
+  name                 String?                @db.VarChar(255)
+  description          String?
+  discount_type        discount_type_enum?
+  discount_value       Decimal?               @db.Decimal(10, 2)
+  start_date           DateTime?              @db.Timestamp(6)
+  end_date             DateTime?              @db.Timestamp(6)
+  is_active            Boolean?
+  combo_offer_products combo_offer_products[]
+}
+
+model countries {
+  country_id   Int            @id @default(autoincrement())
+  name         String?        @db.VarChar(255)
+  code         String?        @db.VarChar(2)
+  cities       cities[]
+  zone_members zone_members[]
+}
+
+model coupons {
+  coupon_id           Int                 @id @default(autoincrement())
+  code                String?             @unique @db.VarChar(255)
+  type                discount_type_enum?
+  value               Decimal?            @db.Decimal(10, 2)
+  min_order_amount    Decimal?            @db.Decimal(10, 2)
+  max_discount_amount Decimal?            @db.Decimal(10, 2)
+  start_date          DateTime?           @db.Timestamp(6)
+  end_date            DateTime?           @db.Timestamp(6)
+  is_active           Boolean?
+}
+
+model currencies {
+  currency_id     Int               @id @default(autoincrement())
+  code            String?           @db.VarChar(3)
+  name            String?           @db.VarChar(255)
+  symbol          String?           @db.VarChar(10)
+  exchange_rate   Decimal?          @db.Decimal(10, 4)
+  order_payments  order_payments[]
+  orders          orders[]
+  purchase_orders purchase_orders[]
+  vouchers        vouchers[]
+  wallet          wallet[]
+}
+
+model customer_groups {
+  customer_group_id   Int         @id @default(autoincrement())
+  group_name          String?     @db.VarChar(255)
+  discount_percentage Decimal?    @db.Decimal(5, 2)
+  customers           customers[]
+  orders              orders[]
+}
+
+model customers {
+  customer_id       Int                 @id @default(autoincrement())
+  user_id           Int?
+  customer_type     customer_type_enum?
+  profile_photo_url String?             @db.VarChar(255)
+  customer_group_id Int?
+  customer_groups   customer_groups?    @relation(fields: [customer_group_id], references: [customer_group_id], onDelete: NoAction, onUpdate: NoAction)
+  users             users?              @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model inventory {
+  inventory_id        Int                   @id @default(autoincrement())
+  product_id          Int?
+  quantity            Int?
+  reorder_level       Int?
+  products            products?             @relation(fields: [product_id], references: [product_id], onDelete: NoAction, onUpdate: NoAction)
+  inventory_movements inventory_movements[]
+}
+
+model inventory_movements {
+  movement_id    Int                 @id @default(autoincrement())
+  inventory_id   Int?
+  movement_type  movement_type_enum?
+  quantity       Int?
+  movement_date  DateTime?           @db.Timestamp(6)
+  reference_type String?             @db.VarChar(255)
+  reference_id   Int?
+  inventory      inventory?          @relation(fields: [inventory_id], references: [inventory_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model languages {
+  language_id Int      @id @default(autoincrement())
+  code        String?  @db.VarChar(5)
+  name        String?  @db.VarChar(255)
+  is_rtl      Boolean?
+}
+
+model order_amount_reward_rules {
+  rule_id            Int                 @id @default(autoincrement())
+  reward_rule_id     Int?
+  min_amount         Decimal             @db.Decimal(10, 2)
+  max_amount         Decimal?            @db.Decimal(10, 2)
+  points             Int
+  is_percentage      Boolean?            @default(false)
+  reward_point_rules reward_point_rules? @relation(fields: [reward_rule_id], references: [rule_id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model order_item_variations {
+  order_item_variation_id        Int                            @id @default(autoincrement())
+  order_item_id                  Int
+  variation_id                   Int
+  combination_id                 Int
+  product_variation_combinations product_variation_combinations @relation(fields: [combination_id], references: [combination_id])
+  order_items                    order_items                    @relation(fields: [order_item_id], references: [order_item_id])
+  product_variations             product_variations             @relation(fields: [variation_id], references: [variation_id])
+}
+
+model order_items {
+  order_item_id                  Int                             @id @default(autoincrement())
+  order_id                       Int?
+  product_id                     Int?
+  quantity                       Int?
+  item_price                     Decimal?                        @db.Decimal(10, 2)
+  item_cost                      Decimal?                        @db.Decimal(10, 2)
+  variation_details              String?
+  variation_combination_id       Int?
+  order_item_variations          order_item_variations[]
+  orders                         orders?                         @relation(fields: [order_id], references: [order_id], onDelete: NoAction, onUpdate: NoAction)
+  products                       products?                       @relation(fields: [product_id], references: [product_id], onDelete: NoAction, onUpdate: NoAction)
+  product_variation_combinations product_variation_combinations? @relation(fields: [variation_combination_id], references: [combination_id], onDelete: NoAction, onUpdate: NoAction)
+  reward_point_details           reward_point_details[]
+}
+
+model order_payments {
+  payment_id            Int                  @id @default(autoincrement())
+  order_id              Int?
+  payment_method        String?              @db.VarChar(255)
+  payment_amount        Decimal?             @db.Decimal(10, 2)
+  payment_date          DateTime?            @db.Timestamp(6)
+  transaction_id        String?              @db.VarChar(255)
+  currency_id           Int?
+  wallet_transaction_id Int?
+  currencies            currencies?          @relation(fields: [currency_id], references: [currency_id], onDelete: NoAction, onUpdate: NoAction)
+  orders                orders?              @relation(fields: [order_id], references: [order_id], onDelete: NoAction, onUpdate: NoAction)
+  wallet_transactions   wallet_transactions? @relation(fields: [wallet_transaction_id], references: [wallet_transaction_id], onDelete: NoAction, onUpdate: NoAction)
+  order_refunds         order_refunds[]
+}
+
+model order_refunds {
+  refund_id      Int             @id @default(autoincrement())
+  order_id       Int?
+  payment_id     Int?
+  refund_amount  Decimal?        @db.Decimal(10, 2)
+  refund_date    DateTime?       @db.Timestamp(6)
+  refund_reason  String?
+  status         String?         @db.VarChar(255)
+  orders         orders?         @relation(fields: [order_id], references: [order_id], onDelete: NoAction, onUpdate: NoAction)
+  order_payments order_payments? @relation(fields: [payment_id], references: [payment_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model orders {
+  order_id                                        Int                  @id @default(autoincrement())
+  user_id                                         Int?
+  guest_id                                        Int                  @default(autoincrement())
+  full_name                                       String?              @db.VarChar(255)
+  mobile_no                                       String?              @db.VarChar(20)
+  email                                           String?              @db.VarChar(255)
+  shipping_address_id                             Int?
+  billing_address_id                              Int?
+  shipping_method                                 String?              @db.VarChar(255)
+  shipping_charge                                 Decimal?             @db.Decimal(10, 2)
+  subtotal                                        Decimal?             @db.Decimal(10, 2)
+  coupon_amount                                   Decimal?             @db.Decimal(10, 2)
+  discount_amount                                 Decimal?             @db.Decimal(10, 2)
+  adjustment_amount                               Decimal?             @db.Decimal(10, 2)
+  total_amount                                    Decimal?             @db.Decimal(10, 2)
+  order_date                                      DateTime?            @db.Timestamp(6)
+  order_status                                    String?              @db.VarChar(255)
+  currency_id                                     Int?
+  tax_id                                          Int?
+  customer_group_id                               Int?
+  rewardPointsDiscount                            Decimal?             @default(0) @db.Decimal(10, 2)
+  rewardPointsUsed                                Int?                 @default(0)
+  chat_conversations                              chat_conversations[]
+  order_items                                     order_items[]
+  order_payments                                  order_payments[]
+  order_refunds                                   order_refunds[]
+  addresses_orders_billing_address_idToaddresses  addresses?           @relation("orders_billing_address_idToaddresses", fields: [billing_address_id], references: [address_id], onDelete: NoAction, onUpdate: NoAction)
+  currencies                                      currencies?          @relation(fields: [currency_id], references: [currency_id], onDelete: NoAction, onUpdate: NoAction)
+  customer_groups                                 customer_groups?     @relation(fields: [customer_group_id], references: [customer_group_id], onDelete: NoAction, onUpdate: NoAction)
+  addresses_orders_shipping_address_idToaddresses addresses?           @relation("orders_shipping_address_idToaddresses", fields: [shipping_address_id], references: [address_id], onDelete: NoAction, onUpdate: NoAction)
+  taxes                                           taxes?               @relation(fields: [tax_id], references: [tax_id], onDelete: NoAction, onUpdate: NoAction)
+  users                                           users?               @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+  return_requests                                 return_requests[]
+  reward_points                                   reward_points[]
+  vouchers                                        vouchers[]
+}
+
+model product_images {
+  image_id   Int       @id @default(autoincrement())
+  product_id Int?
+  image_url  String?   @db.VarChar(255)
+  is_main    Boolean?
+  products   products? @relation(fields: [product_id], references: [product_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model product_quantity_reward_rules_backup {
+  rule_id                Int?
+  product_reward_rule_id Int?
+  min_quantity           Int?
+  max_quantity           Int?
+  bonus_points           Int?
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model product_quantity_reward_rules_final_backup {
+  rule_id                Int?
+  product_reward_rule_id Int?
+  min_quantity           Int?
+  max_quantity           Int?
+  bonus_points           Int?
+
+  @@ignore
+}
+
+model product_questions {
+  question_id   Int       @id @default(autoincrement())
+  product_id    Int?
+  user_id       Int?
+  question      String?
+  answer        String?
+  question_date DateTime? @db.Timestamp(6)
+  products      products? @relation(fields: [product_id], references: [product_id], onDelete: NoAction, onUpdate: NoAction)
+  users         users?    @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model product_reviews {
+  review_id   Int       @id @default(autoincrement())
+  product_id  Int?
+  user_id     Int?
+  rating      Int?
+  comment     String?
+  review_date DateTime? @db.Timestamp(6)
+  status      String?   @default("approved") @db.VarChar(20)
+  products    products? @relation(fields: [product_id], references: [product_id], onDelete: NoAction, onUpdate: NoAction)
+  users       users?    @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([status], map: "idx_product_reviews_status")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model product_reward_rules {
+  rule_id               Int                 @id @default(autoincrement())
+  reward_rule_id        Int?
+  product_id            Int?
+  category_id           Int?
+  points_per_unit       Int?                @default(0)
+  min_quantity          Int?                @default(1)
+  is_percentage         Boolean?            @default(false)
+  percentage_multiplier Decimal?            @default(1.00) @db.Decimal(5, 2)
+  max_quantity          Int?
+  bonus_points          Int?                @default(0)
+  categories            categories?         @relation(fields: [category_id], references: [category_id], onDelete: NoAction, onUpdate: NoAction)
+  products              products?           @relation(fields: [product_id], references: [product_id], onDelete: NoAction, onUpdate: NoAction)
+  reward_point_rules    reward_point_rules? @relation(fields: [reward_rule_id], references: [rule_id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([category_id], map: "idx_product_reward_rules_category_id")
+  @@index([product_id], map: "idx_product_reward_rules_product_id")
+  @@index([min_quantity, max_quantity], map: "idx_product_reward_rules_quantity")
+}
+
+model product_specifications {
+  specification_id    Int       @id @default(autoincrement())
+  product_id          Int?
+  specification_name  String?   @db.VarChar(255)
+  specification_value String?
+  products            products? @relation(fields: [product_id], references: [product_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model product_tags {
+  product_id Int
+  tag_id     Int
+  products   products @relation(fields: [product_id], references: [product_id], onDelete: NoAction, onUpdate: NoAction)
+  tags       tags     @relation(fields: [tag_id], references: [tag_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([product_id, tag_id])
+}
+
+model product_taxes {
+  product_id Int
+  tax_id     Int
+  products   products @relation(fields: [product_id], references: [product_id], onDelete: NoAction, onUpdate: NoAction)
+  taxes      taxes    @relation(fields: [tax_id], references: [tax_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([product_id, tax_id])
+}
+
+model product_variation_combinations {
+  combination_id                                                                       Int                     @id @default(autoincrement())
+  product_id                                                                           Int
+  variation_id_1                                                                       Int
+  variation_id_2                                                                       Int?
+  variation_id_3                                                                       Int?
+  cost                                                                                 Decimal?                @db.Decimal(10, 2)
+  price                                                                                Decimal?                @db.Decimal(10, 2)
+  stock_quantity                                                                       Int?
+  image_url                                                                            String?                 @db.VarChar(255)
+  offer_expiry                                                                         DateTime?               @db.Timestamp(6)
+  offer_price                                                                          Decimal?                @db.Decimal(10, 2)
+  order_item_variations                                                                order_item_variations[]
+  order_items                                                                          order_items[]
+  products                                                                             products                @relation(fields: [product_id], references: [product_id])
+  product_variations_product_variation_combinations_variation_id_1Toproduct_variations product_variations      @relation("product_variation_combinations_variation_id_1Toproduct_variations", fields: [variation_id_1], references: [variation_id])
+  product_variations_product_variation_combinations_variation_id_2Toproduct_variations product_variations?     @relation("product_variation_combinations_variation_id_2Toproduct_variations", fields: [variation_id_2], references: [variation_id])
+  product_variations_product_variation_combinations_variation_id_3Toproduct_variations product_variations?     @relation("product_variation_combinations_variation_id_3Toproduct_variations", fields: [variation_id_3], references: [variation_id])
+}
+
+model product_variations {
+  variation_id                                                                                     Int                              @id @default(autoincrement())
+  variation_name                                                                                   String                           @db.VarChar(255)
+  variation_value                                                                                  String                           @db.VarChar(255)
+  ProductToVariation                                                                               ProductToVariation[]
+  order_item_variations                                                                            order_item_variations[]
+  product_variation_combinations_product_variation_combinations_variation_id_1Toproduct_variations product_variation_combinations[] @relation("product_variation_combinations_variation_id_1Toproduct_variations")
+  product_variation_combinations_product_variation_combinations_variation_id_2Toproduct_variations product_variation_combinations[] @relation("product_variation_combinations_variation_id_2Toproduct_variations")
+  product_variation_combinations_product_variation_combinations_variation_id_3Toproduct_variations product_variation_combinations[] @relation("product_variation_combinations_variation_id_3Toproduct_variations")
+
+  @@unique([variation_name, variation_value])
+}
+
+model products {
+  product_id                                                     Int                              @id @default(autoincrement())
+  sku                                                            String?                          @unique @db.VarChar(255)
+  name                                                           String?                          @db.VarChar(255)
+  description                                                    String?
+  price                                                          Decimal?                         @db.Decimal(10, 2)
+  offer_price                                                    Decimal?                         @db.Decimal(10, 2)
+  offer_expiry                                                   DateTime?                        @db.Timestamp(6)
+  weight                                                         Decimal?                         @db.Decimal(10, 2)
+  length                                                         Decimal?                         @db.Decimal(10, 2)
+  width                                                          Decimal?                         @db.Decimal(10, 2)
+  height                                                         Decimal?                         @db.Decimal(10, 2)
+  brand_id                                                       Int?
+  category_id                                                    Int?
+  product_type                                                   product_type_enum?
+  cost                                                           Decimal?                         @db.Decimal(10, 2)
+  meta_title                                                     String?                          @db.VarChar(255)
+  meta_description                                               String?
+  slug                                                           String?                          @unique @db.VarChar(255)
+  main_image                                                     String?                          @db.VarChar(255)
+  warranty_id                                                    Int?
+  ProductToVariation                                             ProductToVariation[]
+  chat_conversations                                             chat_conversations[]
+  combo_offer_products                                           combo_offer_products[]
+  inventory                                                      inventory[]
+  order_items                                                    order_items[]
+  product_images                                                 product_images[]
+  product_questions                                              product_questions[]
+  product_reviews                                                product_reviews[]
+  product_reward_rules                                           product_reward_rules[]
+  product_specifications                                         product_specifications[]
+  product_tags                                                   product_tags[]
+  product_taxes                                                  product_taxes[]
+  product_variation_combinations                                 product_variation_combinations[]
+  brands                                                         brands?                          @relation(fields: [brand_id], references: [brand_id], onDelete: NoAction, onUpdate: NoAction)
+  categories                                                     categories?                      @relation(fields: [category_id], references: [category_id], onDelete: NoAction, onUpdate: NoAction)
+  warranties                                                     warranties?                      @relation(fields: [warranty_id], references: [warranty_id], onDelete: NoAction, onUpdate: NoAction)
+  purchase_requests                                              purchase_requests[]
+  related_products_related_products_product_idToproducts         related_products[]               @relation("related_products_product_idToproducts")
+  related_products_related_products_related_product_idToproducts related_products[]               @relation("related_products_related_product_idToproducts")
+  reward_point_details                                           reward_point_details[]
+}
+
+model purchase_orders {
+  order_id          Int                @id @default(autoincrement())
+  request_id        Int?
+  supplier_id       Int?
+  order_date        DateTime?          @db.Timestamp(6)
+  expected_date     DateTime?          @db.Timestamp(6)
+  status            String?            @db.VarChar(255)
+  total_amount      Decimal?           @db.Decimal(10, 2)
+  currency_id       Int?
+  currencies        currencies?        @relation(fields: [currency_id], references: [currency_id], onDelete: NoAction, onUpdate: NoAction)
+  purchase_requests purchase_requests? @relation(fields: [request_id], references: [request_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model purchase_requests {
+  request_id      Int               @id @default(autoincrement())
+  product_id      Int?
+  quantity        Int?
+  request_date    DateTime?         @db.Timestamp(6)
+  status          String?           @db.VarChar(255)
+  notes           String?
+  purchase_orders purchase_orders[]
+  products        products?         @relation(fields: [product_id], references: [product_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model related_products {
+  product_id                                             Int
+  related_product_id                                     Int
+  products_related_products_product_idToproducts         products @relation("related_products_product_idToproducts", fields: [product_id], references: [product_id], onDelete: NoAction, onUpdate: NoAction)
+  products_related_products_related_product_idToproducts products @relation("related_products_related_product_idToproducts", fields: [related_product_id], references: [product_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([product_id, related_product_id])
+}
+
+model return_requests {
+  return_request_id Int       @id @default(autoincrement())
+  order_id          Int?
+  user_id           Int?
+  return_reason     String?
+  return_date       DateTime? @db.Timestamp(6)
+  status            String?   @db.VarChar(255)
+  notes             String?
+  orders            orders?   @relation(fields: [order_id], references: [order_id], onDelete: NoAction, onUpdate: NoAction)
+  users             users?    @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model reward_point_details {
+  detail_id          Int                 @id @default(autoincrement())
+  reward_point_id    Int?
+  order_item_id      Int?
+  product_id         Int?
+  rule_id            Int?
+  points             Int
+  points_description String?
+  order_items        order_items?        @relation(fields: [order_item_id], references: [order_item_id], onDelete: NoAction, onUpdate: NoAction)
+  products           products?           @relation(fields: [product_id], references: [product_id], onDelete: NoAction, onUpdate: NoAction)
+  reward_points      reward_points?      @relation(fields: [reward_point_id], references: [reward_point_id], onDelete: Cascade, onUpdate: NoAction)
+  reward_point_rules reward_point_rules? @relation(fields: [rule_id], references: [rule_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([order_item_id], map: "idx_reward_point_details_order_item_id")
+  @@index([reward_point_id], map: "idx_reward_point_details_reward_point_id")
+}
+
+model reward_point_rules {
+  rule_id                   Int                         @id @default(autoincrement())
+  name                      String                      @db.VarChar(255)
+  description               String?
+  is_active                 Boolean?                    @default(true)
+  priority                  Int?                        @default(0)
+  start_date                DateTime?                   @db.Timestamp(6)
+  end_date                  DateTime?                   @db.Timestamp(6)
+  created_at                DateTime?                   @default(now()) @db.Timestamp(6)
+  updated_at                DateTime?                   @default(now()) @db.Timestamp(6)
+  order_amount_reward_rules order_amount_reward_rules[]
+  product_reward_rules      product_reward_rules[]
+  reward_point_details      reward_point_details[]
+}
+
+model reward_points {
+  reward_point_id      Int                    @id @default(autoincrement())
+  user_id              Int?
+  points               Int?
+  earned_date          DateTime?              @db.Timestamp(6)
+  expiry_date          DateTime?              @db.Timestamp(6)
+  order_id             Int?
+  is_used              Boolean?
+  reward_point_details reward_point_details[]
+  orders               orders?                @relation(fields: [order_id], references: [order_id], onDelete: NoAction, onUpdate: NoAction)
+  users                users?                 @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model shipping_methods {
+  shipping_method_id Int      @id @default(autoincrement())
+  name               String?  @db.VarChar(255)
+  description        String?
+  base_cost          Decimal? @db.Decimal(10, 2)
+  is_active          Boolean?
+}
+
+model tags {
+  tag_id       Int            @id @default(autoincrement())
+  tag_name     String?        @db.VarChar(255)
+  image_url    String?        @db.VarChar(255)
+  product_tags product_tags[]
+}
+
+model taxes {
+  tax_id        Int             @id @default(autoincrement())
+  name          String?         @db.VarChar(255)
+  rate          Decimal?        @db.Decimal(5, 2)
+  is_compound   Boolean?
+  orders        orders[]
+  product_taxes product_taxes[]
+}
+
+model user_addresses {
+  user_id    Int
+  address_id Int
+  is_default Boolean?
+  addresses  addresses @relation(fields: [address_id], references: [address_id], onDelete: NoAction, onUpdate: NoAction)
+  users      users     @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([user_id, address_id])
+}
+
+model user_roles {
+  user_id     Int
+  role_id     Int
+  admin_roles admin_roles @relation(fields: [role_id], references: [role_id], onDelete: NoAction, onUpdate: NoAction)
+  users       users       @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([user_id, role_id])
+}
+
+model users {
+  user_id            Int                  @id @default(autoincrement())
+  full_name          String?              @db.VarChar(255)
+  mobile_no          String?              @db.VarChar(20)
+  email              String?              @db.VarChar(255)
+  password           String?              @db.VarChar(255)
+  user_type          user_type_enum?
+  profile_photo_url  String?              @db.VarChar(255)
+  otp                String?              @db.VarChar(6)
+  otp_expiry         DateTime?            @db.Timestamp(6)
+  is_verified        Boolean?
+  is_guest           Boolean?             @default(false)
+  addresses          addresses[]
+  chat_conversations chat_conversations[]
+  customers          customers[]
+  orders             orders[]
+  product_questions  product_questions[]
+  product_reviews    product_reviews[]
+  return_requests    return_requests[]
+  reward_points      reward_points[]
+  user_addresses     user_addresses[]
+  user_roles         user_roles[]
+  wallet             wallet[]
+}
+
+model vouchers {
+  voucher_id  Int         @id @default(autoincrement())
+  code        String?     @unique @db.VarChar(255)
+  amount      Decimal?    @db.Decimal(10, 2)
+  currency_id Int?
+  expiry_date DateTime?   @db.Timestamp(6)
+  is_used     Boolean?
+  order_id    Int?
+  currencies  currencies? @relation(fields: [currency_id], references: [currency_id], onDelete: NoAction, onUpdate: NoAction)
+  orders      orders?     @relation(fields: [order_id], references: [order_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model wallet {
+  wallet_id           Int                   @id @default(autoincrement())
+  user_id             Int?
+  balance             Decimal?              @db.Decimal(10, 2)
+  currency_id         Int?
+  currencies          currencies?           @relation(fields: [currency_id], references: [currency_id], onDelete: NoAction, onUpdate: NoAction)
+  users               users?                @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+  wallet_transactions wallet_transactions[]
+}
+
+model wallet_transactions {
+  wallet_transaction_id Int                    @id @default(autoincrement())
+  wallet_id             Int?
+  transaction_type      transaction_type_enum?
+  amount                Decimal?               @db.Decimal(10, 2)
+  transaction_date      DateTime?              @db.Timestamp(6)
+  reference_type        String?                @db.VarChar(255)
+  reference_id          Int?
+  notes                 String?
+  order_payments        order_payments[]
+  wallet                wallet?                @relation(fields: [wallet_id], references: [wallet_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model warranties {
+  warranty_id     Int        @id @default(autoincrement())
+  warranty_name   String     @db.VarChar(255)
+  duration_months Int
   description     String?
-  isTrashed       Boolean              @default(false)
-  createdByUserId String?
-  createdAt       DateTime             @default(now())
-  isProtected     Boolean              @default(false)
-  isDefault       Boolean              @default(false)
-  users           User[]
-  permissions     UserRolePermission[]
+  created_at      DateTime   @default(now())
+  updated_at      DateTime
+  products        products[]
 }
 
-model UserPermission {
-  id              String               @id @default(uuid())
-  slug            String               @unique
-  name            String
-  description     String?
-  createdByUserId String?
-  createdAt       DateTime             @default(now())
-  roles           UserRolePermission[]
+model zone_members {
+  zone_id    Int
+  country_id Int
+  countries  countries @relation(fields: [country_id], references: [country_id], onDelete: NoAction, onUpdate: NoAction)
+  zones      zones     @relation(fields: [zone_id], references: [zone_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([zone_id, country_id])
 }
 
-model UserRolePermission {
-  id           String   @id @default(uuid())
-  roleId       String
-  permissionId String
-  assignedAt   DateTime @default(now())
-
-  role       UserRole       @relation(fields: [roleId], references: [id], onDelete: Cascade)
-  permission UserPermission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
-
-  @@unique([roleId, permissionId])
+model zones {
+  zone_id      Int            @id @default(autoincrement())
+  zone_name    String?        @db.VarChar(255)
+  description  String?
+  zone_members zone_members[]
 }
 
-model UserAddress {
-  id           String  @id @default(uuid())
-  userId       String
-  addressLine  String
-  addressLine2 String
-  city         String
-  state        String
-  postalCode   String
-  country      String
-  isDefault    Boolean @default(false)
-  user         User    @relation(fields: [userId], references: [id])
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model product_reward_rules_backup {
+  rule_id               Int?
+  reward_rule_id        Int?
+  product_id            Int?
+  category_id           Int?
+  points_per_unit       Int?
+  min_quantity          Int?
+  is_percentage         Boolean?
+  percentage_multiplier Decimal? @db.Decimal(5, 2)
+  quantity_tiers        Json?
 
-  @@index([userId])
+  @@ignore
 }
 
-// System Module
-model SystemLog {
-  id          String   @id @default(uuid())
-  userId      String
-  createdAt   DateTime @default(now())
-  entityId    String?
-  entityType  String?
-  event       String?
-  description String?
-  ipAddress   String?
-  meta        String?
-
-  user User @relation(fields: [userId], references: [id])
-
-  @@index([userId])
+enum customer_type_enum {
+  b2b
+  b2c
 }
 
-model SystemSetting {
-  id             String  @id @default(uuid())
-  name           String  @default("My Company")
-  logo           String?
-  active         Boolean @default(true)
-  address        String?
-  websiteURL     String?
-  supportEmail   String?
-  supportPhone   String?
-  language       String  @default("en")
-  timezone       String  @default("UTC")
-  currency       String  @default("USD")
-  currencyFormat String  @default("$ {value}")
-
-  socialFacebook  String?
-  socialTwitter   String?
-  socialInstagram String?
-  socialLinkedIn  String?
-  socialPinterest String?
-  socialYoutube   String?
-
-  notifyStockEmail               Boolean  @default(true)
-  notifyStockWeb                 Boolean  @default(true)
-  notifyStockThreshold           Int      @default(10)
-  notifyStockRoleIds             String[]
-  notifyNewOrderEmail            Boolean  @default(true)
-  notifyNewOrderWeb              Boolean  @default(true)
-  notifyNewOrderRoleIds          String[]
-  notifyOrderStatusUpdateEmail   Boolean  @default(true)
-  notifyOrderStatusUpdateWeb     Boolean  @default(true)
-  notifyOrderStatusUpdateRoleIds String[]
-  notifyPaymentFailureEmail      Boolean  @default(true)
-  notifyPaymentFailureWeb        Boolean  @default(true)
-  notifyPaymentFailureRoleIds    String[]
-  notifySystemErrorFailureEmail  Boolean  @default(true)
-  notifySystemErrorWeb           Boolean  @default(true)
-  notifySystemErrorRoleIds       String[]
+enum discount_type_enum {
+  fixed_amount
+  percentage
 }
 
-// Ecommerce Module
-enum EcommerceProductStatus {
-  PUBLISHED
-  INACTIVE
+enum movement_type_enum {
+  in
+  out
+  adjustment
 }
 
-enum EcommerceCategoryStatus {
-  ACTIVE
-  INACTIVE
+enum product_type_enum {
+  physical
+  digital
 }
 
-model EcommerceProduct {
-  id              String                  @id @default(uuid())
-  name            String
-  sku             String?                 @unique
-  description     String?
-  price           Float
-  beforeDiscount  Float?
-  isTrashed       Boolean                 @default(false)
-  status          EcommerceProductStatus  @default(PUBLISHED)
-  createdAt       DateTime                @default(now())
-  createdByUserId String?
-  stockValue      Int                     @default(0)
-  categoryId      String?
-  category        EcommerceCategory?      @relation(fields: [categoryId], references: [id])
-  thumbnail       String?
-  createdByUser   User?                   @relation(fields: [createdByUserId], references: [id])
-  productImage    EcommerceProductImage[]
-
-  @@index([categoryId])
-  @@index([createdByUserId])
+enum transaction_type_enum {
+  credit
+  debit
 }
 
-model EcommerceCategory {
-  id              String                  @id @default(uuid())
-  name            String
-  description     String?
-  slug            String                  @unique
-  isTrashed       Boolean                 @default(false)
-  status          EcommerceCategoryStatus @default(ACTIVE)
-  parentId        String?
-  parent          EcommerceCategory?      @relation("CategoryToCategory", fields: [parentId], references: [id])
-  children        EcommerceCategory[]     @relation("CategoryToCategory")
-  createdAt       DateTime                @default(now())
-  createdByUserId String?
-  createdByUser   User?                   @relation(fields: [createdByUserId], references: [id])
-
-  ecommerceProduct EcommerceProduct[]
-
-  @@index([createdByUserId])
-}
-
-model EcommerceProductImage {
-  id        String           @id @default(uuid())
-  productId String
-  url       String
-  product   EcommerceProduct @relation(fields: [productId], references: [id])
-
-  @@index([productId])
+enum user_type_enum {
+  customer
+  admin
 }

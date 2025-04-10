@@ -94,7 +94,7 @@ export async function PUT(
     await prisma.$transaction(async (tx) => {
       const user = await tx.user.update({
         where: { id },
-        data: { name, status: status as UserStatus, roleId },
+        data: { name, status: status as UserStatus, role_id: roleId },
       });
 
       // Log the event

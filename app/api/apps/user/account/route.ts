@@ -6,7 +6,7 @@ export async function GET() {
   try {
     // Check if the user is authenticated
     const currentUser = await getDemoUser();
-    if (!currentUser) {
+    if (!currentUser || !currentUser.email) {
       return NextResponse.json(
         { message: 'Unauthorized action.' },
         { status: 401 }, // Access denied
