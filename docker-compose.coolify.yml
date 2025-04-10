@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - DIRECT_URL=${DIRECT_URL}
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+      - STORAGE_TYPE=${STORAGE_TYPE}
+      - STORAGE_ACCESS_KEY_ID=${STORAGE_ACCESS_KEY_ID}
+      - STORAGE_SECRET_ACCESS_KEY=${STORAGE_SECRET_ACCESS_KEY}
+      - STORAGE_REGION=${STORAGE_REGION}
+      - STORAGE_BUCKET=${STORAGE_BUCKET}
+      - STORAGE_ENDPOINT=${STORAGE_ENDPOINT}
+      - STORAGE_FORCE_PATH_STYLE=${STORAGE_FORCE_PATH_STYLE}
+      - STORAGE_CDN_URL=${STORAGE_CDN_URL}
+      - NODE_ENV=production 

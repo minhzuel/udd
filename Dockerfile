@@ -6,7 +6,7 @@ WORKDIR /app
 # Install dependencies only when needed
 FROM base AS deps
 COPY package.json package-lock.json ./
-RUN npm ci --only=production
+RUN npm ci
 
 # Rebuild the source code only when needed
 FROM base AS builder
@@ -21,7 +21,7 @@ ENV NEXT_TELEMETRY_DISABLED 1
 # Generate Prisma client
 RUN npx prisma generate
 
-# Build application
+# Build application - removing cache mounts that were causing issues
 RUN npm run build
 
 # Production image, copy all the files and run next

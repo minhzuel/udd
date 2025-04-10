@@ -55,6 +55,10 @@ If you're using an external PostgreSQL database, make sure it's accessible from 
    - Build arguments: Leave empty for standard build
    - Port: `3000`
 
+> **Note:** If you encounter Docker build issues with cache mounts or undefined variables like `$NIXPACKS_PATH`,
+> use the provided `docker-compose.coolify.yml` file by selecting "Docker Compose" as the build method
+> and setting the compose file path to `./docker-compose.coolify.yml`.
+
 ### 6. Configure Environment Variables
 
 Set up the following environment variables in Coolify:
