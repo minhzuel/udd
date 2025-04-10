@@ -25,15 +25,10 @@ import {
   type ConversationData 
 } from '@/app/services'
 
-export interface ChatPageProps {
-  params: {
-    id: string;
-  };
-}
-
-export default function ChatPage({ params }: ChatPageProps) {
+export default function ChatPage() {
   const router = useRouter()
-  const conversationId = params.id
+  const params = useParams()
+  const conversationId = params.id as string
   const [conversationTitle, setConversationTitle] = useState('')
   const [conversationOrder, setConversationOrder] = useState<Order | null>(null)
   const [conversationProduct, setConversationProduct] = useState<Product | null>(null)
