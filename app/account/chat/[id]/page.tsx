@@ -25,7 +25,13 @@ import {
   type ConversationData 
 } from '@/app/services'
 
-export default function ChatPage({ params }: { params: { id: string } }) {
+export interface ChatPageProps {
+  params: {
+    id: string;
+  };
+}
+
+export default function ChatPage({ params }: ChatPageProps) {
   const router = useRouter()
   const conversationId = params.id
   const [conversationTitle, setConversationTitle] = useState('')
