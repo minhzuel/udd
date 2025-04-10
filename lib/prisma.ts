@@ -75,4 +75,5 @@ prisma.$on('error', (e) => {
   console.error('Prisma client error:', e)
 })
 
+export { prisma }
 export default prisma
