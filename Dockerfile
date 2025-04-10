@@ -19,11 +19,13 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 # Set environment variables
-ENV NODE_ENV production
-ENV NEXT_TELEMETRY_DISABLED 1
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+# Add database URL for Prisma to work during build
+ENV DATABASE_URL="postgresql://prisma:prisma@localhost:5432/uddoog"
 
-# Generate Prisma client
-RUN npx prisma generate
+# Generate Prisma client - fix by adding binaryTargets
+RUN npx prisma generate --schema=./prisma/schema.prisma
 
 # Build application - removing cache mounts that were causing issues
 RUN npm run build
@@ -32,8 +34,8 @@ RUN npm run build
 FROM base AS runner
 WORKDIR /app
 
-ENV NODE_ENV production
-ENV NEXT_TELEMETRY_DISABLED 1
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
 
 # Create a non-root user
 RUN addgroup --system --gid 1001 nodejs
